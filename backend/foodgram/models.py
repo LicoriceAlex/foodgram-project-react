@@ -1,4 +1,4 @@
-from djangoHexadecimal.fields import HexadecimalField
+# from djangoHexadecimal.fields import HexadecimalField
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -37,7 +37,7 @@ class Tag(models.Model):
         verbose_name='Название тега',
         max_length=20
     )
-    color = HexadecimalField(
+    color = models.CharField(
         verbose_name='Цвет тега',
         max_length=10
     )
