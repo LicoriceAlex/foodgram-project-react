@@ -131,7 +131,7 @@ class RecipePostPatchDelSerializer(serializers.ModelSerializer):
     #             })
     #         tags_list.append(tag)
     #     return value
-
+###
     def create_ingredients_amounts(self, ingredients, recipe):
         IngredientAmount.objects.bulk_create(
             [IngredientAmount(
@@ -151,22 +151,20 @@ class RecipePostPatchDelSerializer(serializers.ModelSerializer):
                                         ingredients=ingredients)
         return recipe
 
+    def update(self, instance, validated_data):
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+        instance = super().update(instance, validated_data)
+        instance.tags.clear()
+        instance.tags.set(tags)
+        instance.ingredients.clear()
+        self.create_ingredients_amounts(recipe=instance,
+                                        ingredients=ingredients)
+        instance.save()
+        return instance
 
-    # @transaction.atomic
-    # def update(self, instance, validated_data):
-    #     tags = validated_data.pop('tags')
-    #     ingredients = validated_data.pop('ingredients')
-    #     instance = super().update(instance, validated_data)
-    #     instance.tags.clear()
-    #     instance.tags.set(tags)
-    #     instance.ingredients.clear()
-    #     self.create_ingredients_amounts(recipe=instance,
-    #                                     ingredients=ingredients)
-    #     instance.save()
-    #     return instance
-
-    # def to_representation(self, instance):
-    #     request = self.context.get('request')
-    #     context = {'request': request}
-    #     return RecipeReadSerializer(instance,
-    #                                 context=context).data
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        context = {'request': request}
+        return RecipeGetSerializer(instance,
+                                   context=context).data
