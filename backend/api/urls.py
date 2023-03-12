@@ -9,7 +9,8 @@ router = DefaultRouter()
 router.register('ingredients', IngredientViewSet, basename='ingredients')
 router.register('tags', TagViewSet, basename='tags')
 router.register('recipes', RecipeViewSet, basename='recipes')
-router.register('users', UserViewSet, basename='users')
+router.register(r'users', UserViewSet, basename='users')
+print(router.urls)
 
 urlpatterns = [
     path('', include(router.urls)),

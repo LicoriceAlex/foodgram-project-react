@@ -1,4 +1,0 @@
-Django==4.1.7
-psycopg2-binary==2.9.5
-python-dotenv==1.0.0
-DjangoHexadecimalField==0.0.3

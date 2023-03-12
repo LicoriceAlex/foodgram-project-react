@@ -29,12 +29,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
+    'users',
     'api.apps.ApiConfig',
-    'users.apps.UsersConfig',
     'foodgram.apps.FoodgramConfig',
 ]
 
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = 'users.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
