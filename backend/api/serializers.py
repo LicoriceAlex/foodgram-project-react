@@ -1,7 +1,9 @@
 from rest_framework import serializers
-from foodgram.models import Ingredient, Tag, Recipe, Favorites, Cart, IngredientAmount
+from foodgram.models import (Ingredient, Tag, Recipe,
+                             Favorites, Cart, IngredientAmount)
 from .services import Base64ImageField
 from django.db.models import F
+from users.serializers import UserGetSerializer
 
 
 class IngredientAmountSerializer(serializers.ModelSerializer):
@@ -26,6 +28,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class RecipeGetSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
+    author = UserGetSerializer(read_only=True)
     ingredients = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -55,7 +58,7 @@ class RecipeGetSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'measurement_unit',
-            amount=F('ingredient_amount')
+            amount=F('ingredient_amount__amount')
         )
         return ingredients
 
@@ -81,6 +84,7 @@ class RecipePostPatchDelSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(),
         many=True
     )
+    author = UserGetSerializer(read_only=True)
     ingredients = IngredientAmountSerializer(many=True)
     image = Base64ImageField()
 
@@ -168,3 +172,12 @@ class RecipePostPatchDelSerializer(serializers.ModelSerializer):
         context = {'request': request}
         return RecipeGetSerializer(instance,
                                    context=context).data
+
+
+class RecipeShortSerializer(serializers.ModelSerializer):
+    image = Base64ImageField
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name',
+                  'image', 'cooking_time',)

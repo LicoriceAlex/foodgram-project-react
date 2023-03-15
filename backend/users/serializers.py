@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from .models import User, Follow
 from foodgram.models import Recipe
 from django.db.models import F
@@ -80,9 +81,9 @@ class FollowGetSerializer(serializers.ModelSerializer):
         if not request or request.user.is_anonymous:
             return False
         recipes = Recipe.objects.filter(author=obj)
-        limit = request.query_params.get('recipes_limit')
-        if limit:
-            recipes = recipes[:int(limit)]
+        # limit = request.query_params.get('recipes_limit')
+        # if limit:
+        #     recipes = recipes[:int(limit)]
         return FollowGetSerializer(
             recipes, many=True, context={'request': request}).data
 
@@ -90,20 +91,20 @@ class FollowGetSerializer(serializers.ModelSerializer):
         return Recipe.objects.filter(author=obj).count()
 
 
-# class SubscriptionSerializer(serializers.ModelSerializer):
-#     """ Сериализатор подписок. """
+class FollowPostDelSerializer(serializers.ModelSerializer):
+    """ Сериализатор подписок. """
 
-#     class Meta:
-#         model = Subscription
-#         fields = ['user', 'author']
-#         validators = [
-#             UniqueTogetherValidator(
-#                 queryset=Subscription.objects.all(),
-#                 fields=['user', 'author'],
-#             )
-#         ]
+    class Meta:
+        model = Follow
+        fields = ('user', 'author',)
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=['user', 'author'],
+            )
+        ]
 
-#     def to_representation(self, instance):
-#         return ShowSubscriptionsSerializer(instance.author, context={
-#             'request': self.context.get('request')
-#         }).data
+    def to_representation(self, instance):
+        return FollowGetSerializer(instance.author, context={
+            'request': self.context.get('request')
+        }).data
