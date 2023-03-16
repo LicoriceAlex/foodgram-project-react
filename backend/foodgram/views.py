@@ -51,13 +51,27 @@ class RecipeViewSet(ModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk=None):
-        recipe = Recipe.objects.get_object_or_404(pk=pk)
+        recipe = get_object_or_404(Recipe, pk=pk)
+        existing_in_cart = Cart.objects.filter(
+            recipe=recipe,
+            user=request.user
+        ).exists()
         if request.method == 'POST':
+            if existing_in_cart:
+                return Response(
+                    {'errors': 'Рецепт уже добавлен в корзину'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             Cart.objects.create(recipe=recipe, user=request.user)
             return Response(status=status.HTTP_201_CREATED)
         elif request.method == 'DELETE':
+            if not existing_in_cart:
+                return Response(
+                    {'errors': 'Рецепт не добавлен в корзину'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             Cart.objects.filter(recipe=recipe, user=request.user).delete()
-            return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'],
