@@ -1,20 +1,27 @@
-from api.serializers import IngredientSerializer, TagSerializer, RecipeGetSerializer, RecipePostPatchDelSerializer
-from rest_framework.viewsets import ModelViewSet, GenericViewSet, ReadOnlyModelViewSet
-from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
-from rest_framework.permissions import SAFE_METHODS
-from foodgram.models import Ingredient, Tag, Recipe, Favorites, Cart
-from rest_framework.decorators import action
-from rest_framework.response import Response
+from api.serializers import (IngredientSerializer, RecipeGetSerializer,
+                             RecipePostPatchDelSerializer, TagSerializer,
+                             RecipeShortSerializer)
+from foodgram.models import Cart, Favorites, Ingredient, Recipe, Tag
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
+from rest_framework import filters
+from rest_framework.decorators import action
+from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
+                                   ListModelMixin, RetrieveModelMixin)
+from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.viewsets import (GenericViewSet, ModelViewSet,
+                                     ReadOnlyModelViewSet)
 
 
-class IngredientViewSet(ModelViewSet):
+class IngredientViewSet(ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
 
 
-class TagViewSet(ModelViewSet):
+class TagViewSet(ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
 
@@ -33,7 +40,7 @@ class RecipeViewSet(ModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk=None):
-        recipe = Recipe.objects.get(pk=pk)
+        recipe = Recipe.objects.get_object_or_404(pk=pk)
         if request.method == 'POST':
             Cart.objects.create(recipe=recipe, user=request.user)
             return Response(status=status.HTTP_201_CREATED)
@@ -45,11 +52,29 @@ class RecipeViewSet(ModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def favorite(self, request, pk=None):
-        recipe = Recipe.objects.get(pk=pk)
+        recipe = get_object_or_404(Recipe, pk=pk)
+        existing_in_favorites = Favorites.objects.filter(
+            recipe=recipe,
+            user=request.user
+        ).exists()
         if request.method == 'POST':
+            if existing_in_favorites:
+                return Response(
+                    {'errors': 'Рецепт уже добавлен в избранное'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             Favorites.objects.create(recipe=recipe, user=request.user)
-            return Response(status=status.HTTP_201_CREATED)
+            serializer = RecipeShortSerializer(recipe)
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+            )
         elif request.method == 'DELETE':
+            if not existing_in_favorites:
+                return Response(
+                    {'errors': 'Рецепт не добавлен в избранное'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             Favorites.objects.filter(recipe=recipe, user=request.user).delete()
-            return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)

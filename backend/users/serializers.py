@@ -1,9 +1,20 @@
+from django.contrib.auth.password_validation import validate_password
+from django.db.models import F
+from foodgram.models import Recipe
+from api.services import Base64ImageField
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-from .models import User, Follow
-from foodgram.models import Recipe
-from django.db.models import F
-from django.contrib.auth.password_validation import validate_password
+
+from .models import Follow, User
+
+
+class RecipeShortSerializer(serializers.ModelSerializer):
+    image = Base64ImageField
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name',
+                  'image', 'cooking_time',)
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -31,9 +42,13 @@ class UserGetSerializer(serializers.ModelSerializer):
         return is_subscribed
 
 
-class UserSetPasswordSerializer(serializers.BaseSerializer):
+class UserSetPasswordSerializer(serializers.ModelSerializer):
     new_password = serializers.CharField(required=True)
     current_password = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('new_password', 'current_password',)
 
     def validate_current_password(self, value):
         request = self.context.get('request')
@@ -69,42 +84,47 @@ class FollowGetSerializer(serializers.ModelSerializer):
             'recipes_count'
         ]
 
-    def get_is_subscribed(self, obj):
+    def get_is_subscribed(self, author):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
         return Follow.objects.filter(
-            user=request.user, author=obj).exists()
+            user=request.user,
+            author=author
+        ).exists()
 
-    def get_recipes(self, obj):
+    def get_recipes(self, author):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
-        recipes = Recipe.objects.filter(author=obj)
-        # limit = request.query_params.get('recipes_limit')
-        # if limit:
-        #     recipes = recipes[:int(limit)]
-        return FollowGetSerializer(
-            recipes, many=True, context={'request': request}).data
+        recipes = Recipe.objects.filter(author=author)
+        limit = request.query_params.get('recipes_limit')
+        if limit:
+            recipes = recipes[:int(limit)]
+        return RecipeShortSerializer(
+            recipes,
+            many=True,
+            context={'request': request}
+        ).data
 
-    def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj).count()
+    def get_recipes_count(self, author):
+        return Recipe.objects.filter(author=author).count()
 
 
-class FollowPostDelSerializer(serializers.ModelSerializer):
-    """ Сериализатор подписок. """
+# class FollowPostDelSerializer(serializers.ModelSerializer):
+#     """ Сериализатор подписок. """
 
-    class Meta:
-        model = Follow
-        fields = ('user', 'author',)
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Follow.objects.all(),
-                fields=['user', 'author'],
-            )
-        ]
+#     class Meta:
+#         model = Follow
+#         fields = ('user', 'author',)
+#         validators = [
+#             UniqueTogetherValidator(
+#                 queryset=Follow.objects.all(),
+#                 fields=['user', 'author'],
+#             )
+#         ]
 
-    def to_representation(self, instance):
-        return FollowGetSerializer(instance.author, context={
-            'request': self.context.get('request')
-        }).data
+#     def to_representation(self, instance):
+#         return FollowGetSerializer(instance.author, context={
+#             'request': self.context.get('request')
+#         }).data

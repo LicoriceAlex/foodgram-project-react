@@ -10,15 +10,15 @@ router.register('ingredients', IngredientViewSet, basename='ingredients')
 router.register('tags', TagViewSet, basename='tags')
 router.register('recipes', RecipeViewSet, basename='recipes')
 router.register('users', UserViewSet, basename='users')
-print(router.urls)
+# print(router.urls)
 
 urlpatterns = [
-    path('auth/', include('djoser.urls.authtoken')),
+    # path('auth/', include('djoser.urls.authtoken')),
     path('', include(router.urls)),
-    path('', include('djoser.urls')),
+    # path('', include('djoser.urls')),
 
-    # path('auth/token/login/', TokenCreateView.as_view()),
-    # path('auth/token/logout/', TokenDestroyView.as_view()),
+    path('auth/token/login/', TokenCreateView.as_view()),
+    path('auth/token/logout/', TokenDestroyView.as_view()),
 
 
 ]

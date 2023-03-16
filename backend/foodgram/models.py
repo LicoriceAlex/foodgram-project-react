@@ -46,8 +46,8 @@ class Tag(models.Model):
 
     class Meta:
         ordering = ('name',)
-        verbose_name = 'Тэг',
-        verbose_name_plural = 'Тэги'
+        verbose_name = 'Тег',
+        verbose_name_plural = 'Теги'
 
     def __str__(self):
         return f'{self.name}, цвет - {self.color}'
