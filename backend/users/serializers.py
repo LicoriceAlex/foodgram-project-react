@@ -1,9 +1,7 @@
-from django.contrib.auth.password_validation import validate_password
-from django.db.models import F
-from foodgram.models import Recipe
 from api.services import Base64ImageField
+from django.contrib.auth.password_validation import validate_password
+from foodgram.models import Recipe
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
 from .models import Follow, User
 
@@ -109,22 +107,3 @@ class FollowGetSerializer(serializers.ModelSerializer):
 
     def get_recipes_count(self, author):
         return Recipe.objects.filter(author=author).count()
-
-
-# class FollowPostDelSerializer(serializers.ModelSerializer):
-#     """ Сериализатор подписок. """
-
-#     class Meta:
-#         model = Follow
-#         fields = ('user', 'author',)
-#         validators = [
-#             UniqueTogetherValidator(
-#                 queryset=Follow.objects.all(),
-#                 fields=['user', 'author'],
-#             )
-#         ]
-
-#     def to_representation(self, instance):
-#         return FollowGetSerializer(instance.author, context={
-#             'request': self.context.get('request')
-#         }).data

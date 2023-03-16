@@ -1,23 +1,24 @@
-from django.http import HttpResponse
-from api.serializers import (IngredientSerializer, RecipeGetSerializer,
-                             RecipePostPatchDelSerializer, TagSerializer,
-                             RecipeShortSerializer)
-from foodgram.models import Cart, Favorites, Ingredient, Recipe, Tag, IngredientAmount
-from django_filters.rest_framework import DjangoFilterBackend
-from .pagination import PageNumberPaginationWithLimit
-from rest_framework import status
+from api.filters import RecipeFilter
+from api.pagination import PageNumberPaginationWithLimit
+from api.permissions import IsAuthorOrAuthenticatedOrReadOnly
 from django.db.models import Sum
-from .filters import RecipeFilter
-from .permissions import IsAuthorOrAuthenticatedOrReadOnly
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
+from foodgram.models import (Cart, Favorites, Ingredient, IngredientAmount,
+                             Recipe, Tag)
+from foodgram.serializers.serializers import (IngredientSerializer,
+                                              RecipeGetSerializer,
+                                              RecipePostPatchDelSerializer,
+                                              TagSerializer)
+from foodgram.serializers.additional_serializers import RecipeShortSerializer
+from rest_framework import filters, status
 from rest_framework.decorators import action
-from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
-                                   ListModelMixin, RetrieveModelMixin)
+# from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
+#                                    ListModelMixin, RetrieveModelMixin)
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import (GenericViewSet, ModelViewSet,
-                                     ReadOnlyModelViewSet)
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):

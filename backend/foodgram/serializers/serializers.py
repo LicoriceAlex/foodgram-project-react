@@ -4,7 +4,7 @@ from foodgram.models import (Cart, Favorites, Ingredient, IngredientAmount,
                              Recipe, Tag)
 from rest_framework import serializers
 from users.serializers import UserGetSerializer
-from .services import Base64ImageField
+from api.services import Base64ImageField
 
 
 class IngredientAmountSerializer(serializers.ModelSerializer):
@@ -167,10 +167,10 @@ class RecipePostPatchDelSerializer(serializers.ModelSerializer):
                                    context=context).data
 
 
-class RecipeShortSerializer(serializers.ModelSerializer):
-    image = Base64ImageField
+# class RecipeShortSerializer(serializers.ModelSerializer):
+#     image = Base64ImageField
 
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name',
-                  'image', 'cooking_time',)
+#     class Meta:
+#         model = Recipe
+#         fields = ('id', 'name',
+#                   'image', 'cooking_time',)
