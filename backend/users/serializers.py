@@ -1,18 +1,18 @@
-from api.services import Base64ImageField
 from django.contrib.auth.password_validation import validate_password
 from foodgram.models import Recipe
 from rest_framework import serializers
 
 from .models import Follow, User
+from foodgram.serializers.additional_serializers import RecipeShortSerializer
 
 
-class RecipeShortSerializer(serializers.ModelSerializer):
-    image = Base64ImageField
+# class RecipeShortSerializer(serializers.ModelSerializer):
+#     image = Base64ImageField
 
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name',
-                  'image', 'cooking_time',)
+#     class Meta:
+#         model = Recipe
+#         fields = ('id', 'name',
+#                   'image', 'cooking_time',)
 
 
 class UserCreateSerializer(serializers.ModelSerializer):

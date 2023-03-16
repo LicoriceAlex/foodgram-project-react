@@ -2,7 +2,8 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from djoser.views import TokenCreateView, TokenDestroyView
 
-from .views import IngredientViewSet, TagViewSet, RecipeViewSet
+from foodgram.views import IngredientViewSet, TagViewSet, RecipeViewSet
+# from .views import IngredientViewSet, TagViewSet, RecipeViewSet
 from users.views import UserViewSet
 
 router = DefaultRouter()
@@ -18,6 +19,4 @@ urlpatterns = [
 
     path('auth/token/login/', TokenCreateView.as_view()),
     path('auth/token/logout/', TokenDestroyView.as_view()),
-
-
 ]
