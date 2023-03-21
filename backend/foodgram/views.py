@@ -7,21 +7,20 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from foodgram.models import (Cart, Favorites, Ingredient, IngredientAmount,
                              Recipe, Tag)
+from foodgram.serializers.additional_serializers import RecipeShortSerializer
 from foodgram.serializers.serializers import (IngredientSerializer,
                                               RecipeGetSerializer,
                                               RecipePostPatchDelSerializer,
                                               TagSerializer)
-from foodgram.serializers.additional_serializers import RecipeShortSerializer
 from rest_framework import filters, status
 from rest_framework.decorators import action
-# from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
-#                                    ListModelMixin, RetrieveModelMixin)
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
+    """Вьюсет для ингредиентов"""
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
     filter_backends = (filters.SearchFilter,)
@@ -29,11 +28,13 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
 
 class TagViewSet(ReadOnlyModelViewSet):
+    """Вьюсет для тегов"""
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
 
 
 class RecipeViewSet(ModelViewSet):
+    """Вьюсет для рецептов"""
     queryset = Recipe.objects.all()
     pagination_class = PageNumberPaginationWithLimit
     permission_classes = (IsAuthorOrAuthenticatedOrReadOnly,)

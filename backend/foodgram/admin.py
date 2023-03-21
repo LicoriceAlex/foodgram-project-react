@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Ingredient, Tag, IngredientAmount, Recipe, Favorites, Cart
+from .models import Cart, Favorites, Ingredient, IngredientAmount, Recipe, Tag
 
 
 class IngredientAmountInLine(admin.StackedInline):
@@ -18,9 +18,37 @@ class CartInLine(admin.StackedInline):
 
 class RecipeAdmin(admin.ModelAdmin):
     inlines = (IngredientAmountInLine, FavoritesInLine, CartInLine)
+    list_display = (
+        'pk',
+        'author',
+        'name',
+        'text',
+        'cooking_time',
+        'pub_date',
+        'get_favorites',
+    )
+
+    def get_favorites(self, recipe):
+        return recipe.in_favorites.count()
+
+    get_favorites.short_description = 'Добавлений в избранное'
+    empty_value_display = 'значение отсутствует'
+    list_filter = ('author', 'name', 'tags')
+    search_fields = ('author', 'name', 'tags')
 
 
-admin.site.register(Ingredient)
+class IngredientAdmin(admin.ModelAdmin):
+    list_display = (
+        'pk',
+        'name',
+        'measurement_unit',
+    )
+    empty_value_display = 'значение отсутствует'
+    list_filter = ('name',)
+    search_fields = ('name',)
+
+
+admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Tag)
 admin.site.register(IngredientAmount)
 admin.site.register(Recipe, RecipeAdmin)

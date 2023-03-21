@@ -1,21 +1,13 @@
 from django.contrib.auth.password_validation import validate_password
 from foodgram.models import Recipe
+from foodgram.serializers.additional_serializers import RecipeShortSerializer
 from rest_framework import serializers
 
 from .models import Follow, User
-from foodgram.serializers.additional_serializers import RecipeShortSerializer
-
-
-# class RecipeShortSerializer(serializers.ModelSerializer):
-#     image = Base64ImageField
-
-#     class Meta:
-#         model = Recipe
-#         fields = ('id', 'name',
-#                   'image', 'cooking_time',)
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор создания пользователя"""
 
     class Meta:
         model = User
@@ -23,6 +15,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class UserGetSerializer(serializers.ModelSerializer):
+    """Сериализатор отображения пользователя"""
     is_subscribed = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -41,6 +34,7 @@ class UserGetSerializer(serializers.ModelSerializer):
 
 
 class UserSetPasswordSerializer(serializers.ModelSerializer):
+    """Сериализатор смены пароля"""
     new_password = serializers.CharField(required=True)
     current_password = serializers.CharField(required=True)
 
@@ -63,7 +57,7 @@ class UserSetPasswordSerializer(serializers.ModelSerializer):
 
 
 class FollowGetSerializer(serializers.ModelSerializer):
-    """ Сериализатор для отображения подписок пользователя. """
+    """Сериализатор отображения подписок пользователя"""
 
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()

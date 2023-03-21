@@ -1,8 +1,7 @@
 from django.urls import include, path
-from rest_framework.routers import DefaultRouter
 from djoser.views import TokenCreateView, TokenDestroyView
-
-from foodgram.views import IngredientViewSet, TagViewSet, RecipeViewSet
+from foodgram.views import IngredientViewSet, RecipeViewSet, TagViewSet
+from rest_framework.routers import DefaultRouter
 from users.views import UserViewSet
 
 router = DefaultRouter()

@@ -12,6 +12,7 @@ User = get_user_model()
 
 
 class RecipeFilter(FilterSet):
+    """Фильтр рецепта"""
     is_favorited = NumberFilter(
         method='get_is_favorited'
     )

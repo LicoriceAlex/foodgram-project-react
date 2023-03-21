@@ -1,13 +1,14 @@
+from api.services import Base64ImageField
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 from foodgram.models import (Cart, Favorites, Ingredient, IngredientAmount,
                              Recipe, Tag)
 from rest_framework import serializers
 from users.serializers import UserGetSerializer
-from api.services import Base64ImageField
 
 
 class IngredientAmountSerializer(serializers.ModelSerializer):
+    """Сериализатор колличества ингредиента в рецепте"""
     id = serializers.IntegerField()
 
     class Meta:
@@ -16,18 +17,21 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+    """Сериализатор ингредиента"""
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit',)
 
 
 class TagSerializer(serializers.ModelSerializer):
+    """Сериализатор тега"""
     class Meta:
         model = Tag
         fields = ('id', 'name', 'color', 'slug')
 
 
 class RecipeGetSerializer(serializers.ModelSerializer):
+    """Сериализатор для представления рецепта"""
     tags = TagSerializer(many=True, read_only=True)
     author = UserGetSerializer(read_only=True)
     ingredients = serializers.SerializerMethodField()
@@ -81,6 +85,7 @@ class RecipeGetSerializer(serializers.ModelSerializer):
 
 
 class RecipePostPatchDelSerializer(serializers.ModelSerializer):
+    """Сериализатор создания рецепта"""
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True
@@ -133,7 +138,6 @@ class RecipePostPatchDelSerializer(serializers.ModelSerializer):
         IngredientAmount.objects.bulk_create(
             [IngredientAmount(
                 ingredient=get_object_or_404(Ingredient, id=ingredient['id']),
-                # ingredient=Ingredient.objects.get(id=ingredient['id']),
                 recipe=recipe,
                 amount=ingredient['amount']
             ) for ingredient in ingredients]
@@ -165,12 +169,3 @@ class RecipePostPatchDelSerializer(serializers.ModelSerializer):
         context = {'request': request}
         return RecipeGetSerializer(instance,
                                    context=context).data
-
-
-# class RecipeShortSerializer(serializers.ModelSerializer):
-#     image = Base64ImageField
-
-#     class Meta:
-#         model = Recipe
-#         fields = ('id', 'name',
-#                   'image', 'cooking_time',)

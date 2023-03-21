@@ -21,6 +21,7 @@ class UserViewSet(CreateModelMixin,
                   RetrieveModelMixin,
                   ListModelMixin,
                   GenericViewSet):
+    """Вьюсет пользователя"""
     queryset = User.objects.all()
     pagination_class = PageNumberPaginationWithLimit
     permission_classes = (IsAuthenticatedOrListOnly,)
@@ -42,9 +43,8 @@ class UserViewSet(CreateModelMixin,
             user.set_password(serializer.validated_data['new_password'])
             user.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False,
             permission_classes=[IsAuthenticated],
@@ -91,18 +91,15 @@ class UserViewSet(CreateModelMixin,
                 context={'request': request}
             )
             return Response(serializer.data)
-        elif request.method == 'DELETE':
-            if user == author:
-                return Response(
-                    {'errors': 'Вы не можете отписаться от себя'},
-                    status=status.HTTP_400_BAD_REQUEST)
-            follow = Follow.objects.filter(user=user, author=author)
-            if not follow.exists():
-                return Response(
-                    {'errors': 'Вы не подписаны на этого пользователя'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            elif follow.exists():
-                follow.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if user == author:
+            return Response(
+                {'errors': 'Вы не можете отписаться от себя'},
+                status=status.HTTP_400_BAD_REQUEST)
+        follow = Follow.objects.filter(user=user, author=author)
+        if not follow.exists():
+            return Response(
+                {'errors': 'Вы не подписаны на этого пользователя'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        follow.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

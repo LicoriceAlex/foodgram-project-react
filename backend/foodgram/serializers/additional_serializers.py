@@ -4,6 +4,7 @@ from api.services import Base64ImageField
 
 
 class RecipeShortSerializer(serializers.ModelSerializer):
+    """Сериализатор для уменьшенного представления рецепта"""
     image = Base64ImageField
 
     class Meta:
