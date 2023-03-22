@@ -59,13 +59,12 @@ class RecipeGetSerializer(serializers.ModelSerializer):
         )
 
     def get_ingredients(self, recipe):
-        ingredients = recipe.ingredients.values(
+        return recipe.ingredients.values(
             'id',
             'name',
             'measurement_unit',
             amount=F('ingredient_amount__amount')
         )
-        return ingredients
 
     def get_is_favorited(self, recipe):
         user = self.context.get('request').user

@@ -51,9 +51,9 @@ class UserViewSet(CreateModelMixin,
             methods=['get'])
     def me(self, request):
         return Response(
-                self.get_serializer(request.user).data,
-                status=status.HTTP_200_OK,
-            )
+            self.get_serializer(request.user).data,
+            status=status.HTTP_200_OK,
+        )
 
     @action(detail=False,
             permission_classes=[IsAuthenticated],

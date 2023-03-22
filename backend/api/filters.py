@@ -1,11 +1,7 @@
 from django.contrib.auth import get_user_model
-from django_filters.rest_framework import (
-    FilterSet,
-    ModelChoiceFilter,
-    ModelMultipleChoiceFilter,
-    NumberFilter
-)
-
+from django_filters.rest_framework import (FilterSet, ModelChoiceFilter,
+                                           ModelMultipleChoiceFilter,
+                                           NumberFilter)
 from foodgram.models import Recipe, Tag
 
 User = get_user_model()

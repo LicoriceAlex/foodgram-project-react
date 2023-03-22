@@ -3,7 +3,7 @@ from django.db import models
 
 
 class User(AbstractUser):
-    """Кастомная модель пользователя."""
+    """Кастомная модель пользователя"""
     email = models.EmailField(
         max_length=254,
         verbose_name='Адрес электронной почты',

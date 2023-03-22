@@ -1,6 +1,6 @@
+from api.services import Base64ImageField
 from foodgram.models import Recipe
 from rest_framework import serializers
-from api.services import Base64ImageField
 
 
 class RecipeShortSerializer(serializers.ModelSerializer):

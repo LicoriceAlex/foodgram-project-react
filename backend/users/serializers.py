@@ -13,6 +13,12 @@ class UserCreateSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email', 'username', 'first_name', 'last_name', 'password')
 
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        context = {'request': request}
+        return UserGetSerializer(instance,
+                                 context=context).data
+
 
 class UserGetSerializer(serializers.ModelSerializer):
     """Сериализатор отображения пользователя"""
@@ -27,10 +33,8 @@ class UserGetSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
-        is_subscribed = Follow.objects.filter(
-            user=request.user, author=user
-        ).exists()
-        return is_subscribed
+        return Follow.objects.filter(
+            user=request.user, author=user).exists()
 
 
 class UserSetPasswordSerializer(serializers.ModelSerializer):
@@ -46,10 +50,9 @@ class UserSetPasswordSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request.user.check_password(value):
             return value
-        else:
-            raise serializers.ValidationError(
-                'Неправильный пароль'
-            )
+        raise serializers.ValidationError(
+            'Неправильный пароль'
+        )
 
     def validate_new_password(self, value):
         validate_password(value)

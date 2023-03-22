@@ -65,15 +65,13 @@ class RecipeViewSet(ModelViewSet):
                 )
             Cart.objects.create(recipe=recipe, user=request.user)
             return Response(status=status.HTTP_201_CREATED)
-        elif request.method == 'DELETE':
-            if not existing_in_cart:
-                return Response(
-                    {'errors': 'Рецепт не добавлен в корзину'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            Cart.objects.filter(recipe=recipe, user=request.user).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        if not existing_in_cart:
+            return Response(
+                {'errors': 'Рецепт не добавлен в корзину'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        Cart.objects.filter(recipe=recipe, user=request.user).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated])
@@ -115,12 +113,10 @@ class RecipeViewSet(ModelViewSet):
                 serializer.data,
                 status=status.HTTP_201_CREATED
             )
-        elif request.method == 'DELETE':
-            if not existing_in_favorites:
-                return Response(
-                    {'errors': 'Рецепт не добавлен в избранное'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            Favorites.objects.filter(recipe=recipe, user=request.user).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        if not existing_in_favorites:
+            return Response(
+                {'errors': 'Рецепт не добавлен в избранное'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        Favorites.objects.filter(recipe=recipe, user=request.user).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
