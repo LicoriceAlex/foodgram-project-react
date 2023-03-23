@@ -2,6 +2,8 @@ from django.contrib import admin
 
 from .models import Cart, Favorites, Ingredient, IngredientAmount, Recipe, Tag
 
+# ругается isort, если делать построчный импорт
+
 
 class IngredientAmountInLine(admin.StackedInline):
     model = IngredientAmount

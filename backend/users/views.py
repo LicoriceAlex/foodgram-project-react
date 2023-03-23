@@ -1,30 +1,24 @@
 from api.pagination import PageNumberPaginationWithLimit
-from api.permissions import IsAuthenticatedOrListOnly
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.mixins import (CreateModelMixin, ListModelMixin,
-                                   RetrieveModelMixin)
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
 
 from .models import Follow
 from .serializers import (FollowGetSerializer, UserCreateSerializer,
                           UserGetSerializer, UserSetPasswordSerializer)
+from api.mixins import CustomUserViewSet
 
 User = get_user_model()
 
 
-class UserViewSet(CreateModelMixin,
-                  RetrieveModelMixin,
-                  ListModelMixin,
-                  GenericViewSet):
+class UserViewSet(CustomUserViewSet):
     """Вьюсет пользователя"""
     queryset = User.objects.all()
     pagination_class = PageNumberPaginationWithLimit
-    permission_classes = (IsAuthenticatedOrListOnly,)
+    permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:

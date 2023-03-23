@@ -1,10 +1,22 @@
-from api.services import Base64ImageField
-from django.db.models import F
 from django.shortcuts import get_object_or_404
 from foodgram.models import (Cart, Favorites, Ingredient, IngredientAmount,
                              Recipe, Tag)
 from rest_framework import serializers
 from users.serializers import UserGetSerializer
+
+from .additional_serializers import Base64ImageField
+
+
+class IngredientInRecipeReadSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='ingredient.id')
+    name = serializers.CharField(source='ingredient.name')
+    measurement_unit = serializers.CharField(
+        source='ingredient.measurement_unit'
+    )
+
+    class Meta:
+        model = IngredientAmount
+        fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
 class IngredientAmountSerializer(serializers.ModelSerializer):
@@ -34,7 +46,9 @@ class RecipeGetSerializer(serializers.ModelSerializer):
     """Сериализатор для представления рецепта"""
     tags = TagSerializer(many=True, read_only=True)
     author = UserGetSerializer(read_only=True)
-    ingredients = serializers.SerializerMethodField()
+    ingredients = IngredientInRecipeReadSerializer(
+        source='ingredient_amount',
+        many=True, read_only=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField()
@@ -58,27 +72,15 @@ class RecipeGetSerializer(serializers.ModelSerializer):
             'is_shopping_cart',
         )
 
-    def get_ingredients(self, recipe):
-        return recipe.ingredients.values(
-            'id',
-            'name',
-            'measurement_unit',
-            amount=F('ingredient_amount__amount')
-        )
-
     def get_is_favorited(self, recipe):
         user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return Favorites.objects.filter(
+        return user.is_authenticated and Favorites.objects.filter(
             user=user, recipe=recipe.id
         ).exists()
 
     def get_is_in_shopping_cart(self, recipe):
         user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return Cart.objects.filter(
+        return user.is_authenticated and Cart.objects.filter(
             user=user, recipe=recipe.id
         ).exists()
 
