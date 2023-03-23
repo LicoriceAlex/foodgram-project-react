@@ -1,5 +1,20 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
+
+USER = 'user'
+ADMIN = 'admin'
+ROLES = [
+    ('user', USER),
+    ('admin', ADMIN)
+]
+
+
+class MyUserManager(UserManager):
+
+    def create_superuser(
+            self, username, email, password, role='admin', **extra_fields):
+        return super().create_superuser(
+            username, email, password, role='admin', **extra_fields)
 
 
 class User(AbstractUser):
@@ -24,6 +39,11 @@ class User(AbstractUser):
     password = models.CharField(
         max_length=150,
         verbose_name='Пароль'
+    )
+    role = models.CharField(
+        max_length=max(len(role) for _, role in ROLES),
+        choices=ROLES,
+        default=USER
     )
     REQUIRED_FIELDS = ["email"]
 

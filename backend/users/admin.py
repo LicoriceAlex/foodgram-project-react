@@ -13,6 +13,7 @@ class UserAdmin(admin.ModelAdmin):
         'email',
         'first_name',
         'last_name',
+        'role'
     )
     empty_value_display = 'значение отсутствует'
     list_filter = ('username', 'email')

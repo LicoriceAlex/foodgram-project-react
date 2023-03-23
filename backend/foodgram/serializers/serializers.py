@@ -1,10 +1,16 @@
 from django.shortcuts import get_object_or_404
-from foodgram.models import (Cart, Favorites, Ingredient, IngredientAmount,
-                             Recipe, Tag)
 from rest_framework import serializers
-from users.serializers import UserGetSerializer
 
 from .additional_serializers import Base64ImageField
+from users.serializers import UserGetSerializer
+from foodgram.models import (
+    Cart,
+    Favorites,
+    Ingredient,
+    IngredientAmount,
+    Recipe,
+    Tag
+)
 
 
 class IngredientInRecipeReadSerializer(serializers.ModelSerializer):
