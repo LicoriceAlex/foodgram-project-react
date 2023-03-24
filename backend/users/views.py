@@ -11,6 +11,7 @@ from .serializers import (
     UserCreateSerializer,
     UserGetSerializer,
     UserSetPasswordSerializer,
+    FollowSerializer
 )
 from api.mixins import CustomUserViewSet
 from api.pagination import PageNumberPaginationWithLimit
@@ -73,31 +74,20 @@ class UserViewSet(CustomUserViewSet):
     def subscribe(self, request, pk=None):
         user = request.user
         author = get_object_or_404(User, pk=pk)
-        if request.method == 'POST':
-            if user == author:
-                return Response(
-                    {'errors': 'Вы не можете подписаться на себя'},
-                    status=status.HTTP_400_BAD_REQUEST)
-            if Follow.objects.filter(user=user, author=author).exists():
-                return Response(
-                    {'errors': 'Вы уже подписаны на этого пользователя'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            Follow.objects.create(user=user, author=author)
+        data = {
+            "user": user.pk,
+            "author": pk
+        }
+        serializer = FollowSerializer(data=data)
+        if (request.method == 'POST'
+                and serializer.is_valid(raise_exception=True)):
+            serializer.save()
             serializer = FollowGetSerializer(
                 author,
                 context={'request': request}
             )
             return Response(serializer.data)
-        if user == author:
-            return Response(
-                {'errors': 'Вы не можете отписаться от себя'},
-                status=status.HTTP_400_BAD_REQUEST)
-        follow = Follow.objects.filter(user=user, author=author)
-        if not follow.exists():
-            return Response(
-                {'errors': 'Вы не подписаны на этого пользователя'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+
+        follow = get_object_or_404(Follow, user=user, author=author)
         follow.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -31,9 +31,7 @@ class UserGetSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, user):
         request = self.context.get('request')
-        if request is None or request.user.is_anonymous:
-            return False
-        return Follow.objects.filter(
+        return request.user.is_authenticated and Follow.objects.filter(
             user=request.user, author=user).exists()
 
 
@@ -81,9 +79,7 @@ class FollowGetSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, author):
         request = self.context.get('request')
-        if request is None or request.user.is_anonymous:
-            return False
-        return Follow.objects.filter(
+        return request.user.is_authenticated and Follow.objects.filter(
             user=request.user,
             author=author
         ).exists()
@@ -104,3 +100,27 @@ class FollowGetSerializer(serializers.ModelSerializer):
 
     def get_recipes_count(self, author):
         return Recipe.objects.filter(author=author).count()
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    """Сериализатор подписки"""
+
+    class Meta:
+        model = Follow
+        fields = ('user', 'author',)
+
+    def validate(self, data):
+        if data['user'] == data['author']:
+            raise serializers.ValidationError(
+                'Нельзя подписаться на себя'
+            )
+        return data
+
+    def create(self, validated_data):
+        if Follow.objects.filter(
+                user=validated_data['user'],
+                author=validated_data['author']).exists():
+            raise serializers.ValidationError(
+                'Вы уже подписаны на этого пользователя'
+            )
+        return Follow.objects.create(**validated_data)
