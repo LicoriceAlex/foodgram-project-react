@@ -1,5 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
-from djoser.serializers import UserCreateSerializer
+# from djoser.serializers import
 from rest_framework import serializers
 
 from .models import Follow, User
@@ -7,7 +7,7 @@ from foodgram.models import Recipe
 from foodgram.serializers.additional_serializers import RecipeShortSerializer
 
 
-class UserCreateSerializer(UserCreateSerializer):
+class UserCreateSerializer(serializers.ModelSerializer):
     """Сериализатор создания пользователя"""
 
     class Meta:
@@ -32,8 +32,9 @@ class UserGetSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, user):
         request = self.context.get('request')
-        return request.user.is_authenticated and Follow.objects.filter(
-            user=request.user, author=user).exists()
+        return (request is not None
+                and request.user.is_authenticated and Follow.objects.filter
+                (user=request.user, author=user).exists())
 
 
 class UserSetPasswordSerializer(serializers.ModelSerializer):
@@ -80,10 +81,9 @@ class FollowGetSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, author):
         request = self.context.get('request')
-        return request.user.is_authenticated and Follow.objects.filter(
-            user=request.user,
-            author=author
-        ).exists()
+        return (request is not None
+                and request.user.is_authenticated and Follow.objects.filter
+                (user=request.user, author=author).exists())
 
     def get_recipes(self, author):
         request = self.context.get('request')
