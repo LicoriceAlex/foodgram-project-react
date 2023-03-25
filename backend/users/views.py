@@ -15,6 +15,8 @@ from .serializers import (
 )
 from api.mixins import CustomUserViewSet
 from api.pagination import PageNumberPaginationWithLimit
+from api.permissions import IsAuthenticatedOrListOnly
+
 
 User = get_user_model()
 
@@ -23,7 +25,7 @@ class UserViewSet(CustomUserViewSet):
     """Вьюсет пользователя"""
     queryset = User.objects.all()
     pagination_class = PageNumberPaginationWithLimit
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticatedOrListOnly,)
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
