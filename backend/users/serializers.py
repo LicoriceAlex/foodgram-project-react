@@ -1,4 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
+from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
 from .models import Follow, User
@@ -6,7 +7,7 @@ from foodgram.models import Recipe
 from foodgram.serializers.additional_serializers import RecipeShortSerializer
 
 
-class UserCreateSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(UserCreateSerializer):
     """Сериализатор создания пользователя"""
 
     class Meta:
