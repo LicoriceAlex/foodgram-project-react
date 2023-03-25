@@ -25,7 +25,7 @@ class UserViewSet(CustomUserViewSet):
     """Вьюсет пользователя"""
     queryset = User.objects.all()
     pagination_class = PageNumberPaginationWithLimit
-    permission_classes = (IsAuthenticatedOrListOnly,)
+    # permission_classes = (IsAuthenticatedOrListOnly,)
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
