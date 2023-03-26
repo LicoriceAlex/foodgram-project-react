@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 USER = 'user'
@@ -7,14 +7,6 @@ ROLES = [
     ('user', USER),
     ('admin', ADMIN)
 ]
-
-
-class MyUserManager(UserManager):
-
-    def create_superuser(
-            self, username, email, password, role='admin', **extra_fields):
-        return super().create_superuser(
-            username, email, password, role='admin', **extra_fields)
 
 
 class User(AbstractUser):
