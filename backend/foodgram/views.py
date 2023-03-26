@@ -17,7 +17,8 @@ from foodgram.serializers.additional_serializers import RecipeShortSerializer
 from foodgram.serializers.serializers import (IngredientSerializer,
                                               RecipeGetSerializer,
                                               RecipePostPatchDelSerializer,
-                                              TagSerializer)
+                                              TagSerializer,
+                                              CartSerializer)
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
@@ -53,11 +54,19 @@ class RecipeViewSet(ModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk=None):
+        user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-        if request.method == 'POST':
-            Cart.objects.create(recipe=recipe, user=request.user)
+        data = {
+            "user": user.pk,
+            "recipe": pk
+        }
+        serializer = CartSerializer(data=data)
+        if (request.method == 'POST'
+                and serializer.is_valid(raise_exception=True)):
+            serializer.save()
             return Response(status=status.HTTP_201_CREATED)
-        Cart.objects.filter(recipe=recipe, user=request.user).delete()
+        recipe_in_cart = get_object_or_404(Cart, user=user, recipe=recipe)
+        recipe_in_cart.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'],

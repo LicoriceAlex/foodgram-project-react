@@ -84,11 +84,11 @@ class UserViewSet(CustomUserViewSet):
         if (request.method == 'POST'
                 and serializer.is_valid(raise_exception=True)):
             serializer.save()
-            serializer = FollowGetSerializer(
+            serializer_to_repr = FollowGetSerializer(
                 author,
                 context={'request': request}
             )
-            return Response(serializer.data)
+            return Response(serializer_to_repr.data)
 
         follow = get_object_or_404(Follow, user=user, author=author)
         follow.delete()

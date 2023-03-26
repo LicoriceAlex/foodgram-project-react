@@ -176,3 +176,20 @@ class RecipePostPatchDelSerializer(serializers.ModelSerializer):
         context = {'request': request}
         return RecipeGetSerializer(instance,
                                    context=context).data
+
+
+class CartSerializer(serializers.ModelSerializer):
+    """Сериализатор корзины"""
+
+    class Meta:
+        model = Cart
+        fields = ('user', 'recipe',)
+
+    def create(self, validated_data):
+        if Cart.objects.filter(
+                user=validated_data['user'],
+                recipe=validated_data['recipe']).exists():
+            raise serializers.ValidationError(
+                'Вы уже добавили рецепт в список покупок'
+            )
+        return Cart.objects.create(**validated_data)
