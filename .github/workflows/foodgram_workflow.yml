@@ -45,6 +45,7 @@ jobs:
           script: |
             sudo rm -f .env        
             sudo touch .env
+            sudo chmod 666 .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
             echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env
             echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
