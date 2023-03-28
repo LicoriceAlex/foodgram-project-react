@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import (FilterSet, ModelChoiceFilter,
                                            ModelMultipleChoiceFilter,
-                                           NumberFilter)
+                                           NumberFilter, CharFilter)
 
-from foodgram.models import Recipe, Tag
+from foodgram.models import Recipe, Tag, Ingredient
 
 User = get_user_model()
 
@@ -27,7 +27,7 @@ class RecipeFilter(FilterSet):
 
     class Meta:
         model = Recipe
-        fields = ('is_favorited', 'author', 'tags')
+        fields = ('is_favorited', 'author', 'tags',)
 
     def get_is_favorited(self, queryset, name, value):
         if value and self.request.user.is_authenticated:
@@ -38,3 +38,11 @@ class RecipeFilter(FilterSet):
         if value and self.request.user.is_authenticated:
             return queryset.filter(in_carts__user=self.request.user)
         return queryset
+
+
+class IngredientFilter(FilterSet):
+    name = CharFilter(lookup_expr='icontains')
+
+    class Meta:
+        model = Ingredient
+        fields = ('name',)
