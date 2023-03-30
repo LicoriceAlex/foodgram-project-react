@@ -2,21 +2,16 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Follow
-from .serializers import (
-    FollowGetSerializer,
-    UserCreateSerializer,
-    UserGetSerializer,
-    UserSetPasswordSerializer,
-    FollowSerializer
-)
 from api.mixins import CustomUserViewSet
 from api.pagination import PageNumberPaginationWithLimit
-from api.permissions import IsAuthenticatedOrListOnly
 
+from .models import Follow
+from .serializers import (FollowGetSerializer, FollowSerializer,
+                          UserCreateSerializer, UserGetSerializer,
+                          UserSetPasswordSerializer)
 
 User = get_user_model()
 

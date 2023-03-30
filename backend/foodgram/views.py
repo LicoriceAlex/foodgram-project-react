@@ -3,31 +3,30 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
-from rest_framework.filters import SearchFilter
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from api.filters import RecipeFilter, IngredientFilter
+from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import PageNumberPaginationWithLimit
 from api.permissions import IsAuthorOrAuthenticatedOrReadOnly
 from foodgram.models import (Cart, Favorites, Ingredient, IngredientAmount,
                              Recipe, Tag)
 from foodgram.serializers.additional_serializers import RecipeShortSerializer
-from foodgram.serializers.serializers import (IngredientSerializer,
+from foodgram.serializers.serializers import (CartSerializer,
+                                              IngredientSerializer,
                                               RecipeGetSerializer,
                                               RecipePostPatchDelSerializer,
-                                              TagSerializer,
-                                              CartSerializer)
+                                              TagSerializer)
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
     """Вьюсет для ингредиентов"""
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
-    filter_backends = [SearchFilter]
-    search_fields = ['^name']
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = IngredientFilter
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -65,7 +64,9 @@ class RecipeViewSet(ModelViewSet):
         if (request.method == 'POST'
                 and serializer.is_valid(raise_exception=True)):
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED)
         recipe_in_cart = get_object_or_404(Cart, user=user, recipe=recipe)
         recipe_in_cart.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

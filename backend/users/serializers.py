@@ -1,10 +1,11 @@
-from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
-from .models import Follow, User
 from foodgram.models import Recipe
 from foodgram.serializers.additional_serializers import RecipeShortSerializer
+
+from .models import Follow, User
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
