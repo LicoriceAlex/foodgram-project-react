@@ -10,9 +10,7 @@ services:
 
   backend:
     build: 
-      context: ../backend 
-      dockerfile: Dockerfile 
-    # image: alexsavin03/foodgram_backend
+    image: alexsavin03/foodgram_backend
     restart: always
     volumes:
       - static_value:/app/static/
@@ -34,7 +32,6 @@ services:
     ports:
       - 80:80
     volumes:
-      # - ../docs/:/usr/share/nginx/html/api/docs/
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/redoc.html:/usr/share/nginx/html/api/docs/redoc.html
