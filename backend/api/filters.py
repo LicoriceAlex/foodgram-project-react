@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
+from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import (FilterSet, ModelChoiceFilter,
                                            ModelMultipleChoiceFilter,
-                                           NumberFilter, CharFilter)
+                                           NumberFilter, CharFilter)                                           )
 
 from foodgram.models import Recipe, Tag, Ingredient
 
@@ -40,9 +41,6 @@ class RecipeFilter(FilterSet):
         return queryset
 
 
-class IngredientFilter(FilterSet):
-    name = CharFilter(lookup_expr='icontains')
+class IngredientFilter(SearchFilter):
+    search_param = '^name'
 
-    class Meta:
-        model = Ingredient
-        fields = ('name',)
